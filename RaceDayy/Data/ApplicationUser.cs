@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.General;
 using System.ComponentModel.DataAnnotations;
 namespace RaceDayy.Data;
 
@@ -14,7 +15,7 @@ public enum Gender
 
     PreferNotToSay
 }
-public class ApplicationUser : IdentityUser
+public class ApplicationUser : IdentityUser   
 {
     [Required, MaxLength(50)]
     public string FirstName { get; set; } = string.Empty;

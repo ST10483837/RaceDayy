@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using RaceDayy.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
+using RaceDayy.Data;
 
 
 namespace RaceDayy.Controllers
@@ -10,11 +11,11 @@ namespace RaceDayy.Controllers
     [Authorize(Roles = "Admin")]
     public class UserRoles : Controller
     {
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
 
         public UserRoles(
-            UserManager<IdentityUser> userManager,
+            UserManager<ApplicationUser> userManager,
             RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
@@ -77,9 +78,9 @@ namespace RaceDayy.Controllers
             }
             return View(model);
         }
-
-        //Post: /UserRoles/Manage
-        [HttpPost]
+    
+    //Post: /UserRoles/Manage
+    [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Manage(List<ManageUserRoleViewModel> model, string userId)
         {
@@ -95,7 +96,7 @@ namespace RaceDayy.Controllers
                 ModelState.AddModelError("", "Cannot remove user existing roles!");
                 return View(model);
             }
-            result = await _userManager.AddToRolesAsync(user, model.Where(x => x.isSelected).Select(y => y.RoleName));
+            result = await _userManager.AddToRolesAsync(user,model.Where(x => x.isSelected).Select(y => y.RoleName));
             if (!result.Succeeded)
             {
                 ModelState.AddModelError("", "Cannot add selected roles to user");

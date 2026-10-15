@@ -5,12 +5,13 @@
 }
 
 @{
-    ViewData["Title"] = "Page Not Found";
-}
-    }
+    ViewData["Title"] = "Not Found";
 
-    <div class="container mt-5 text-center">
-        <h1 class="text-danger">danger!</h1>
-        <p class="lead">@ViewBag.ErrorMessage</p>
-    <a asp-controller="UserRoles"asp-action="Index">class="btn btn-primary"Back to users</a>
-    </div>
+}
+
+<div class="container mt-5 text-center">
+    <h1 class="text-danger"> Not Found!</h1>
+    <p class="lead">@ViewBag.ErrorMessage</p>
+    <a asp-controller="UserRoles" asp-action="Index" class="btn btn-primary">Back to Users</a>
+
+</div>

@@ -22,7 +22,7 @@ namespace RaceDayy.Controllers
         }
 
         //Get: /UserRoles
-        public async Task< IActionResult> Index()
+        public async Task<IActionResult> Index()
         {
             var users = await _userManager.Users.ToListAsync();
             var userRolesViewModel = new List<UserRolesViewModel>();
@@ -35,12 +35,12 @@ namespace RaceDayy.Controllers
                     Email = user.Email ?? "",
                     UserName = user.UserName ?? "",
                     Roles = await _userManager.GetRolesAsync(user)
-                    
+
                 };
-                userRolesViewModel.Add(thisViewModel);  
-               
+                userRolesViewModel.Add(thisViewModel);
+
             }
-            return View(userRolesViewModel); 
+            return View(userRolesViewModel);
         }
 
         //Get: /UserRoles/Manage/userId=xxx
@@ -51,10 +51,10 @@ namespace RaceDayy.Controllers
             if (user == null)
             {
                 ViewBag.ErrorMessage = $"User with Id = {userId} cannot be found";
-                return View ("Not Found");
+                return View("Not Found");
             }
 
-            ViewBag.UserName = user.UserName; 
+            ViewBag.UserName = user.UserName;
             var model = new List<ManageUserRoleViewModel>();
             foreach (var role in _roleManager.Roles)
             {
@@ -62,7 +62,7 @@ namespace RaceDayy.Controllers
                 {
                     RoleId = role.Id,
                     RoleName = role.Name ?? "",
-                    
+
                 };
 
                 if (await _userManager.IsInRoleAsync(user, role.Name ?? ""))
@@ -78,35 +78,30 @@ namespace RaceDayy.Controllers
             return View(model);
         }
 
-     //Post: /UserRoles/Manage
-    [HttpPost]
+        //Post: /UserRoles/Manage
+        [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Manage(string userId, List<ManageUserRoleViewModel> model)
+        public async Task<IActionResult> Manage(List<ManageUserRoleViewModel> model, string userId)
         {
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
             {
-
                 return View("Not Found");
             }
             var roles = await _userManager.GetRolesAsync(user);
             var result = await _userManager.RemoveFromRolesAsync(user, roles);
-            if (result.Succeeded)
+            if (!result.Succeeded)
             {
-                ModelState.AddModelError("", "Cannot remove user existing role!");
+                ModelState.AddModelError("", "Cannot remove user existing roles!");
                 return View(model);
-
             }
-
             result = await _userManager.AddToRolesAsync(user, model.Where(x => x.isSelected).Select(y => y.RoleName));
-            if (result.Succeeded)
+            if (!result.Succeeded)
             {
-                ModelState.AddModelError("", "Cannot add selected role to user!");
+                ModelState.AddModelError("", "Cannot add selected roles to user");
                 return View(model);
             }
-
-            return RedirectToAction(nameof(Index));
-
+            return RedirectToAction("Index");
         }
     }
 }

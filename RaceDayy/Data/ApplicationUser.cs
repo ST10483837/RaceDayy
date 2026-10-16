@@ -13,7 +13,7 @@ public enum Gender
 
     Other,
 
-    PreferNotToSay
+    PreferNotToSay 
 }
 public class ApplicationUser : IdentityUser   
 {

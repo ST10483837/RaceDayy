@@ -40,7 +40,7 @@ namespace RaceDayy.Controllers
                 };
                 userRolesViewModel.Add(thisViewModel);
 
-            }
+            } 
             return View(userRolesViewModel);
         }
 

@@ -4,18 +4,17 @@ using RaceDayy.Models;
 
 namespace RaceDayy.Controllers
 {
-
     public class HomeController : Controller
     {
+
         public IActionResult AdminDashboard()
         {
             return View();
         }
-        
+
 
         public IActionResult Index()
         {
-
             return View();
         }
 

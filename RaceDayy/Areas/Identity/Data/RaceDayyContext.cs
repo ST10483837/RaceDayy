@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace RaceDayy.Data;
 
-public class RaceDayyContext : IdentityDbContext<IdentityUser>
+public class RaceDayyContext : IdentityDbContext<ApplicationUser>
 {
     public RaceDayyContext(DbContextOptions<RaceDayyContext> options)
         : base(options)

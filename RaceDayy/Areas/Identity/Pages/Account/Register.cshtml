@@ -33,7 +33,7 @@
 
             <div class="mb-3">
                 <label asp-for="Input.ProfileImage" class="form-label"></label>
-                <input asp-for="Input.ProfileImage" type="file" accept="image/*" class="form-control" />
+                <input asp-for="Input.ProfileImage" type="file" accept=".jpg,.jpeg,.png,.webp" class="form-control" />
                 <span asp-validation-for="Input.ProfileImage" class="text-danger"></span>
             </div>
 

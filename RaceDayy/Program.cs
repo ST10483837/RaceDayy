@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 using RaceDayy.Data;
+using RaceDayy.Models.Interface;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,21 +13,20 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
-    .AddRoles<IdentityRole>() 
+    .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
-//builder.Services.AddScoped<IProfileImageService, ProfileImageService>();
+builder.Services.AddScoped<IProfileImageService, ProfileImageService>();
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
-
-using var scope = app.Services.CreateScope();
+using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     db.Database.Migrate();
-    
-    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();    
-    var roles = new[] { "Admin", "Organiser", "Participant" };  
+
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    var roles = new[] { "Admin", "Organizer", "Participant" };
 
     foreach (var role in roles)
     {
@@ -37,24 +38,20 @@ using var scope = app.Services.CreateScope();
 
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
     string email = "admin@admin.com";
-    string Password = "Admin1@";
-    
+    string password = "Admin1@";
+
     if (await userManager.FindByEmailAsync(email) == null)
     {
         var User = new ApplicationUser();
+
         User.UserName = email;
         User.Email = email;
         User.EmailConfirmed = true;
 
-        await userManager.CreateAsync(User, Password);
+        await userManager.CreateAsync(User, password);
         await userManager.AddToRoleAsync(User, "Admin");
-        {
-            
-        }
     }
 }
-
-
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -68,7 +65,7 @@ else
 }
 
 app.UseHttpsRedirection();
-
+app.UseStaticFiles();
 app.UseStaticFiles();
 
 app.UseRouting();

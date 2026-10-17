@@ -76,6 +76,8 @@ Results
 
 CI/CD Status
 GitHub Actions is configured to automatically build the project and run all unit tests on every push to the repository.
+<img width="818" height="91" alt="image" src="https://github.com/user-attachments/assets/f134611a-a781-409a-be05-6e814c0ce01a" />
+
 
 Video Walkthrough
 Watch the Part 2 walkthrough here

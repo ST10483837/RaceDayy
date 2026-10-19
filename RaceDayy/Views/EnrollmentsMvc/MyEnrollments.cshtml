@@ -1,0 +1,51 @@
+﻿@model IEnumerable<RaceDayy.Models.Enrollment>
+
+@{
+    ViewData["Title"] = "My Enrollments";
+}
+
+<h1>My Enrollments</h1>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+
+<table class="table table-striped mt-3">
+    <thead>
+        <tr>
+            <th>Event Name</th>
+            <th>Category</th>
+            <th>Date</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.Any())
+        {
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Category?.Event?.EventName</td>
+                    <td>@item.Category?.CategoryName</td>
+                    <td>@item.EnrollmentDate.ToString("yyyy-MM-dd")</td>
+                    <td><span class="badge bg-success">@item.Status</span></td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="4" class="text-center">You haven't enrolled in any events yet.</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div class="mt-3">
+    <a asp-controller="EventsMvc" asp-action="Index" class="btn btn-primary">Browse Events</a>
+</div>

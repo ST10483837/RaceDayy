@@ -21,8 +21,17 @@
                     <li class="nav-item">
                         <a class="nav-link" asp-controller="Home" asp-action="Index">Home</a>
                     </li>
+
+                    <!-- NEW EVENTS LINK -->
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="EventsMvc" asp-action="Index">Events</a>
+                    </li>
+
                     <li class="nav-item">
                         <a class="nav-link" href="/swagger">Swagger API</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="EnrollmentsMvc" asp-action="MyEnrollments">Enrollments</a>
                     </li>
 
                     @if (User.IsInRole("Admin"))

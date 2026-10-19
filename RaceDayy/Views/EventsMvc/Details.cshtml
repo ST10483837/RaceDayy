@@ -1,0 +1,57 @@
+﻿@model RaceDayy.Models.Event
+
+@{
+    ViewData["Title"] = "Event Details";
+}
+
+<h1>@Model.EventName</h1>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <h5 class="card-title">Event Information</h5>
+        <p class="card-text"><strong>Date:</strong> @Model.EventDate.ToString("yyyy-MM-dd HH:mm")</p>
+        <p class="card-text"><strong>Distance:</strong> @Model.Distance km (@Model.EventType)</p>
+        <p class="card-text"><strong>Venue:</strong> @Model.Venue?.VenueName, @Model.Venue?.City</p>
+        <p class="card-text"><strong>Description:</strong> @Model.Description</p>
+    </div>
+</div>
+
+<h3>Available Categories</h3>
+
+@if (Model.Categories != null && Model.Categories.Any())
+{
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Category Name</th>
+                <th>Distance</th>
+                <th>Entry Fee</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var category in Model.Categories)
+            {
+                <tr>
+                    <td>@category.CategoryName</td>
+                    <td>@category.DistanceKm km</td>
+                    <td>R @category.EntryFee</td>
+                    <td>
+                        <form asp-controller="EnrollmentsMvc" asp-action="Enroll" method="post">
+                            <input type="hidden" name="categoryId" value="@category.CategoryID" />
+                            <button type="submit" class="btn btn-sm btn-success">Enroll</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="alert alert-warning">No categories have been defined for this event yet.</div>
+}
+
+<div class="mt-3">
+    <a asp-action="Index" class="btn btn-secondary">Back to Events</a>
+</div>

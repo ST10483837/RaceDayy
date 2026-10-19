@@ -1,0 +1,46 @@
+﻿@model IEnumerable<RaceDayy.Models.Event>
+
+@{
+    ViewData["Title"] = "Events";
+}
+
+<div class="d-flex justify-content-between align-items-center">
+    <h1>Events</h1>
+    @if (User.IsInRole("Admin") || User.IsInRole("Organizer"))
+    {
+        <a asp-action="Create" class="btn btn-primary">Create Event</a>
+    }
+</div>
+
+<table class="table table-striped mt-3">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Date</th>
+            <th>Distance (km)</th>
+            <th>Event type</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.EventName</td>
+                <td>@item.EventDate.ToString("yyyy-MM-dd HH:mm")</td>
+                <td>@item.Distance</td>
+                <td>@item.EventType</td>
+                <td>
+                    <!-- The Quick Enroll button -->
+                    <form asp-controller="EnrollmentsMvc" asp-action="Enroll" method="post" class="d-inline">
+                        <!-- For demo purposes, we are passing categoryId 1. -->
+                        <input type="hidden" name="categoryId" value="1" />
+                        <button type="submit" class="btn btn-sm btn-success">Quick Enroll</button>
+                    </form>
+
+                    <a asp-action="Details" asp-route-id="@item.EventID" class="btn btn-sm btn-outline-primary">Details</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

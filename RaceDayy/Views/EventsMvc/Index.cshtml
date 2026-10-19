@@ -8,7 +8,8 @@
     <h1>Events</h1>
     @if (User.IsInRole("Admin") || User.IsInRole("Organizer"))
     {
-        <a asp-action="Create" class="btn btn-primary">Create Event</a>
+        <!-- Notice the asp-controller attribute added here -->
+        <a asp-controller="EventsMvc" asp-action="Create" class="btn btn-primary">Create Event</a>
     }
 </div>
 
@@ -33,14 +34,14 @@
                 <td>
                     <!-- The Quick Enroll button -->
                     <form asp-controller="EnrollmentsMvc" asp-action="Enroll" method="post" class="d-inline">
-                        <!-- For demo purposes, we are passing categoryId 1. -->
                         <input type="hidden" name="categoryId" value="1" />
                         <button type="submit" class="btn btn-sm btn-success">Quick Enroll</button>
                     </form>
 
-                    <a asp-action="Details" asp-route-id="@item.EventID" class="btn btn-sm btn-outline-primary">Details</a>
+                    <!-- Added asp-controller here as well just to be safe -->
+                    <a asp-controller="EventsMvc" asp-action="Details" asp-route-id="@item.EventID" class="btn btn-sm btn-outline-primary">Details</a>
                 </td>
             </tr>
         }
-    </tbody> 
+    </tbody>
 </table>

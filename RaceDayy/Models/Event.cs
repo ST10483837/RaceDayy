@@ -9,10 +9,18 @@
         public string Status { get; set; } = "Upcoming";
         public string EventType { get; set; } = "Run";
         public double Distance { get; set; }
+
+        
+        public string? BannerImageUrl { get; set; }
+        public string? BannerBlobName { get; set; }
+        
+
         public int OrganizerID { get; set; }
         public Organizer? Organizer { get; set; }
+
         public int VenueID { get; set; }
         public Venue? Venue { get; set; }
+
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
         public ICollection<Category> Categories { get; set; } = new List<Category>();

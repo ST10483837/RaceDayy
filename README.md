@@ -81,6 +81,7 @@ GitHub Actions is configured to automatically build the project and run all unit
 
 Video Walkthrough
 Watch the Part 2 walkthrough here
+https://youtu.be/8vxbLZg1sUc?si=SmGAcKKJMhoepH8K 
 
 Author
 Student Number: ST10483837

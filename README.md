@@ -1,94 +1,78 @@
-# RaceDayy — Event Management System (Part 2)
+# RaceDayy — Full-Stack Event Management System
 
 ## Overview
-RaceDayy is a full-stack event management system designed for the South African road running, walking, and cycling community. This repository contains the **Part 2 implementation**, which includes a RESTful API for data management, an MVC frontend for user interaction, and a SQL Server database.
+RaceDayy is a comprehensive web-based event management platform designed for the South African road running, walking, and cycling community. This repository contains the final Part 3 implementation, bringing together a RESTful API, an MVC frontend, secure Azure cloud storage, and Docker containerisation.
 
-## Features
-- User registration and login with role-based access (Admin / Organizer / Participant)
-- Session-based authentication using ASP.NET Core Identity
-- Organizer Dashboard to view event statistics
-- Admin User Roles Management page
-- RESTful API endpoints for Auth, Events, and Venues
-- Swagger integration for API testing
-- Unit tests with xUnit and EF Core InMemory
+## Features Implemented
+- **Role-Based Access Control:** Distinct dashboards and permissions for Admins, Organizers, and Participants using ASP.NET Core Identity.
+- **Event Management:** Organizers can Create, Read, Update, and Delete (CRUD) events.
+- **Cloud Image Storage:** Integrated Azure Blob Storage to securely upload and display event banner images.
+- **Categories & Enrolments:** Organizers can define race categories (e.g., 42km, 21km), and Participants can enroll in them.
+- **Modern UI:** A custom purple, blue, and grey sporting theme with colour-coded status badges (Green for Registered, Amber for Pending).
+- **API Documentation:** Fully interactive Swagger UI for testing all backend endpoints.
+- **Automated Testing:** xUnit tests covering authentication and event logic.
 
 ## Technologies Used
-- ASP.NET Core 8.0 (MVC + Web API)
-- Entity Framework Core (Code-First)
-- SQL Server
-- ASP.NET Core Identity for authentication
-- xUnit for unit testing
-- GitHub Actions for CI/CD
-
-## User Roles
-
-### Admin
-- View and manage user roles via the "Manage Users" page
-- Full access to the system
-
-### Organizer
-- Create and manage events and venues
-- View dashboard statistics (total events, categories, enrolments)
-- Capture race results
-
-### Participant
-- Browse and enrol in events
-- View personal performance history
+- **Backend:** ASP.NET Core 8.0 (MVC + Web API)
+- **Database:** Entity Framework Core (Code-First) with SQL Server
+- **Authentication:** ASP.NET Core Identity
+- **Cloud Storage:** Azure Blob Storage (`Azure.Storage.Blobs`)
+- **Containerisation:** Docker
+- **Testing:** xUnit, Moq, EF Core InMemory
+- **CI/CD:** GitHub Actions
 
 ## Setup Instructions
 
 ### Prerequisites
 - Visual Studio 2022
 - .NET 8.0 SDK
-- SQL Server (Express or Developer edition)
+- SQL Server (LocalDB or Express)
+- Docker Desktop (for containerisation)
 
-### Running the Project
+### Running Locally
 1. Clone the repository.
 2. Open `RaceDayy.sln` in Visual Studio.
-3. Ensure the connection string in `appsettings.json` points to your local SQL Server.
-4. Open the Package Manager Console and run:
+3. Update the `DefaultConnection` string in `appsettings.json` to point to your SQL Server.
+4. Add your Azure Storage Connection String to the `AzureStorage` section in `appsettings.json`.
+5. Run the migrations:
    ```powershell
-   Update-Database -Context ApplicationDbContext
-5. Press F5 to run the project
-
-   Default Seeded Users
+   Update-Database
+6. Press F5 to run the application.
+7. Default Test Users
 Role	Email	Password
 Admin	admin@admin.com	Admin1@
-API Documentation
-Once the project is running, navigate to /swagger in your browser to view and test the RESTful API endpoints (Auth, Events, Venues).
+Organizer	organiser@raceday.com	Organizer@1
+Participant	participant@raceday.com	Participant@1
 
-Database Schema
-The database matches the Part 1 ERD with the following entities:
+Docker Setup
 
-Organizer
+To run this application inside a Docker container, ensure Docker Desktop is running and execute the following commands in the root directory:
 
-Participant
+1. Build the Docker image:
 
-Venue
+bash
+docker build -t racedayy-app .
 
-Event
+2.Run the container:
 
-Category
+bash
+docker run -d -p 8080:8080 --name racedayy-container racedayy-app
 
-Enrollment
-
-Results
+3.Open your browser and navigate to: http://localhost:8080
 
 CI/CD Status
-GitHub Actions is configured to automatically build the project and run all unit tests on every push to the repository.
-<img width="818" height="91" alt="image" src="https://github.com/user-attachments/assets/f134611a-a781-409a-be05-6e814c0ce01a" />
+A GitHub Actions workflow is configured to automatically build the project and run unit tests on every push.
 
+https://ci-screenshot.png/
 
 Video Walkthrough
-Watch the Part 2 walkthrough here
-https://youtu.be/8vxbLZg1sUc?si=SmGAcKKJMhoepH8K 
+Watch the Part 3 Walkthrough Here
 
 Author
 Student Number: ST10483837
 
 Module: PROG6212
 
-Institution: Rosebank International 
-
+Institution: Rosebank International University
 
 

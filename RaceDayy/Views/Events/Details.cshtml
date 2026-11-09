@@ -1,0 +1,71 @@
+﻿@using RaceDayy.Models
+@model Event
+
+@{
+    ViewData["Title"] = Model.EventName;
+    bool isOwner = ViewBag.IsOwner == true;
+}
+
+<!-- Displays success or error messages -->
+<partial name="_Alerts" />
+
+<h1 class="h3 mt-3">@Model.EventName</h1>
+
+@if (!string.IsNullOrEmpty(Model.BannerImageUrl))
+{
+    <img src="@Model.BannerImageUrl" alt="Banner for @Model.EventName" class="img-fluid rounded w-100 mb-3"
+         style="max-height:320px;object-fit:cover" />
+}
+
+<p class="text-muted">@Model.EventType &middot; @Model.Distance.ToString("0.##") km</p>
+
+<dl class="row">
+    <dt class="col-sm-2">Description</dt>
+    <dd class="col-sm-10">@Model.Description</dd>
+
+    <dt class="col-sm-2">Date</dt>
+    <dd class="col-sm-10">@Model.EventDate.ToString("dddd, d MMMM yyyy HH:mm")</dd>
+
+    <dt class="col-sm-2">Organiser</dt>
+    <dd class="col-sm-10">
+        @if (Model.Organizer != null && Model.Organizer.User != null)
+        {
+            @($"{Model.Organizer.User.FirstName} {Model.Organizer.User.LastName}")
+        }
+        else
+        {
+            <span class="text-muted">Unknown</span>
+        }
+    </dd>
+
+    <dt class="col-sm-2">Categories</dt>
+    <dd class="col-sm-10">
+        @if (Model.Categories != null && Model.Categories.Any())
+        {
+            <ul>
+                @foreach (var cat in Model.Categories)
+                {
+                    <li>@cat.CategoryName - @cat.DistanceKm km (R @cat.EntryFee)</li>
+                }
+            </ul>
+        }
+        else
+        {
+            <span class="text-muted">No categories added yet.</span>
+        }
+    </dd>
+</dl>
+
+<!-- Action Buttons for Organizers and Admins -->
+@if (isOwner || User.IsInRole("Admin"))
+{
+    <div class="mt-4">
+        <a asp-action="Edit" asp-route-id="@Model.EventID" class="btn btn-warning">Edit Event</a>
+        <a asp-action="Delete" asp-route-id="@Model.EventID" class="btn btn-danger">Delete Event</a>
+        <a asp-controller="Categories" asp-action="Index" asp-route-eventId="@Model.EventID" class="btn btn-info text-white">Manage Categories</a>
+    </div>
+}
+
+<div class="mt-4">
+    <a asp-action="Index">Back to List</a>
+</div>

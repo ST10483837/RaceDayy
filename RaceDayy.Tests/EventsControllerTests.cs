@@ -1,8 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Moq;
 using RaceDayy.Controllers;
 using RaceDayy.Data;
 using RaceDayy.Models;
+using RaceDayy.Services;
 using Xunit;
 
 namespace RaceDayy.Tests
@@ -17,50 +20,66 @@ namespace RaceDayy.Tests
             return new ApplicationDbContext(options);
         }
 
-        [Fact]
-        public async Task GetAll_ReturnsOkWithEmptyList()
+        private (UserManager<ApplicationUser>, IBlobStorageService) GetMockDependencies()
         {
-            // Arrange
-            var context = GetInMemoryDbContext();
-            var controller = new EventsController(context);
+            var mockUserStore = new Mock<IUserStore<ApplicationUser>>();
+            var mockUserManager = new Mock<UserManager<ApplicationUser>>(
+                mockUserStore.Object, null!, null!, null!, null!, null!, null!, null!, null!);
 
-            // Act
-            var result = await controller.GetAll();
+            var mockBlobs = new Mock<IBlobStorageService>();
 
-            // Assert
-            Assert.IsType<OkObjectResult>(result);
+            return (mockUserManager.Object, mockBlobs.Object);
         }
 
         [Fact]
-        public async Task GetById_WithInvalidId_ReturnsNotFound()
+        public async Task Index_ReturnsViewWithEvents()
         {
             // Arrange
             var context = GetInMemoryDbContext();
-            var controller = new EventsController(context);
+            var (mockUserManager, mockBlobs) = GetMockDependencies();
+
+            var controller = new EventsController(context, mockUserManager, mockBlobs);
 
             // Act
-            var result = await controller.GetById(999);
+            var result = await controller.Index();
 
             // Assert
-            Assert.IsType<NotFoundObjectResult>(result);
+            Assert.IsType<ViewResult>(result);
         }
 
         [Fact]
-        public async Task GetById_WithValidId_ReturnsOk()
+        public async Task Details_WithInvalidId_ReturnsNotFound()
         {
             // Arrange
             var context = GetInMemoryDbContext();
+            var (mockUserManager, mockBlobs) = GetMockDependencies();
+            var controller = new EventsController(context, mockUserManager, mockBlobs);
+
+            // Act
+            var result = await controller.Details(999);
+
+            // Assert
+            Assert.IsType<NotFoundResult>(result);
+        }
+
+        [Fact]
+        public async Task Details_WithValidId_ReturnsView()
+        {
+            // Arrange
+            var context = GetInMemoryDbContext();
+            var (mockUserManager, mockBlobs) = GetMockDependencies();
+
             context.Venues.Add(new Venue { VenueID = 1, VenueName = "Test Venue", Address = "Test", City = "Test", Country = "SA" });
             context.Events.Add(new Event { EventID = 1, EventName = "Comrades", EventDate = DateTime.Now, VenueID = 1, OrganizerID = 1 });
             await context.SaveChangesAsync();
 
-            var controller = new EventsController(context);
+            var controller = new EventsController(context, mockUserManager, mockBlobs);
 
             // Act
-            var result = await controller.GetById(1);
+            var result = await controller.Details(1);
 
             // Assert
-            Assert.IsType<OkObjectResult>(result);
+            Assert.IsType<ViewResult>(result);
         }
     }
-} 
+}

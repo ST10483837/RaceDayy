@@ -22,7 +22,11 @@ namespace RaceDayy.Controllers
             _blobs = blobs;
         }
 
-        // Both roles
+        // ==========================================
+        // MVC WEB PAGES (Views)
+        // ==========================================
+
+        // GET: /Events
         public async Task<IActionResult> Index()
         {
             ViewBag.UserId = _users.GetUserId(User);
@@ -41,21 +45,29 @@ namespace RaceDayy.Controllers
             if (id == null) return NotFound();
 
             var ev = await _db.Events
-                .Include(e => e.Organizer)
+                .Include(e => e.Organizer).ThenInclude(o => o.User)
                 .Include(e => e.Categories)
                 .FirstOrDefaultAsync(m => m.EventID == id);
 
             if (ev == null) return NotFound();
 
+            var userId = _users.GetUserId(User);
+            var organizer = await _db.Organizers.FirstOrDefaultAsync(o => o.UserId == userId);
+
+            ViewBag.IsOwner = organizer != null && ev.OrganizerID == organizer.OrganizerID;
+            ViewBag.IsEnrolled = false; // Placeholder for when we build enrollments
+
             return View(ev);
         }
 
+        // GET: /Events/Create
         [Authorize(Roles = "Admin,Organizer")]
         public IActionResult Create()
         {
             return View(new Event { EventDate = DateTime.Today.AddDays(30).AddHours(8) });
         }
 
+        // POST: /Events/Create
         [HttpPost, ValidateAntiForgeryToken, RequestSizeLimit(5_000_000)]
         [Authorize(Roles = "Admin,Organizer")]
         public async Task<IActionResult> Create([Bind("EventName,Description,EventDate,Distance,EventType")] Event ev, IFormFile? bannerFile)
@@ -70,17 +82,41 @@ namespace RaceDayy.Controllers
 
             if (!ModelState.IsValid) return View(ev);
 
-            // Link to the organizer creating the event
-            var organizer = await _db.Organizers.FirstOrDefaultAsync(o => o.UserId == _users.GetUserId(User));
-            if (organizer != null)
+            // --- FIX 1: FIND OR CREATE ORGANIZER ---
+            var userId = _users.GetUserId(User);
+            var organizer = await _db.Organizers.FirstOrDefaultAsync(o => o.UserId == userId);
+
+            if (organizer == null)
             {
-                ev.OrganizerID = organizer.OrganizerID;
+                var user = await _users.FindByIdAsync(userId);
+                organizer = new Organizer
+                {
+                    UserId = userId,
+                    Name = $"{user.FirstName} {user.LastName}",
+                    Email = user.Email ?? ""
+                };
+                _db.Organizers.Add(organizer);
+                await _db.SaveChangesAsync();
             }
-            else
+            ev.OrganizerID = organizer.OrganizerID;
+
+            // --- FIX 2: FIND OR CREATE A DEFAULT VENUE ---
+            var venue = await _db.Venues.FirstOrDefaultAsync();
+            if (venue == null)
             {
-                // Fallback if no organizer profile exists
-                ev.OrganizerID = 1;
+                venue = new Venue
+                {
+                    VenueName = "Default Stadium",
+                    Address = "123 Main Street",
+                    City = "Johannesburg",
+                    Country = "South Africa",
+                    Capacity = 5000
+                };
+                _db.Venues.Add(venue);
+                await _db.SaveChangesAsync();
             }
+            ev.VenueID = venue.VenueID;
+            // -----------------------------------------
 
             BlobUploadResult? uploaded = null;
 
@@ -98,7 +134,6 @@ namespace RaceDayy.Controllers
             }
             catch
             {
-                // Don't leave an orphaned image in the container if the database save failed
                 if (uploaded != null) await _blobs.DeleteAsync(uploaded.BlobName);
                 throw;
             }
@@ -107,23 +142,22 @@ namespace RaceDayy.Controllers
             return RedirectToAction("Index", "Categories", new { eventId = ev.EventID });
         }
 
+        // GET: /Events/Edit/5
         [Authorize(Roles = "Admin,Organizer")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
-
             var ev = await _db.Events.FindAsync(id);
             if (ev == null) return NotFound();
-
             return View(ev);
         }
 
+        // POST: /Events/Edit/5
         [HttpPost, ValidateAntiForgeryToken, RequestSizeLimit(5_000_000)]
         [Authorize(Roles = "Admin,Organizer")]
         public async Task<IActionResult> Edit(int id, [Bind("EventID,EventName,Description,EventDate,Distance,EventType")] Event ev, IFormFile? bannerFile, bool removeBanner)
         {
             if (id != ev.EventID) return NotFound();
-
             var existingEvent = await _db.Events.FindAsync(id);
             if (existingEvent == null) return NotFound();
 
@@ -136,7 +170,6 @@ namespace RaceDayy.Controllers
 
             if (!ModelState.IsValid) return View(ev);
 
-            // Whitelist bindable properties (prevents over-posting, keeps OrganizerID safe)
             existingEvent.EventName = ev.EventName;
             existingEvent.Description = ev.Description;
             existingEvent.EventDate = ev.EventDate;
@@ -169,7 +202,6 @@ namespace RaceDayy.Controllers
                 throw;
             }
 
-            // Only after the database points at the new image, delete the old one
             if ((uploaded != null || removeBanner) && oldBlobName != null)
                 await _blobs.DeleteAsync(oldBlobName);
 
@@ -177,17 +209,17 @@ namespace RaceDayy.Controllers
             return RedirectToAction(nameof(Details), new { id });
         }
 
+        // GET: /Events/Delete/5
         [Authorize(Roles = "Admin,Organizer")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
-
             var ev = await _db.Events.FindAsync(id);
             if (ev == null) return NotFound();
-
             return View(ev);
         }
 
+        // POST: /Events/Delete/5
         [HttpPost, ActionName("Delete"), ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin,Organizer")]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -195,7 +227,6 @@ namespace RaceDayy.Controllers
             var ev = await _db.Events.FindAsync(id);
             if (ev == null) return NotFound();
 
-            // Check if there are enrollments before deleting
             if (await _db.Enrollments.AnyAsync(e => e.Category.EventID == id))
             {
                 TempData["Error"] = "This event has enrolments and cannot be deleted.";
@@ -203,18 +234,34 @@ namespace RaceDayy.Controllers
             }
 
             var blobName = ev.BannerBlobName;
-
-            _db.Events.Remove(ev); // Categories are cascade-deleted
+            _db.Events.Remove(ev);
             await _db.SaveChangesAsync();
 
-            // Delete the image from Azure after the database record is gone
-            if (blobName != null)
-            {
-                await _blobs.DeleteAsync(blobName);
-            }
+            if (blobName != null) await _blobs.DeleteAsync(blobName);
 
             TempData["Success"] = "Event deleted.";
             return RedirectToAction(nameof(Index));
+        }
+
+        // ==========================================
+        // API ENDPOINTS (Swagger)
+        // ==========================================
+
+        [HttpGet("api/events")]
+        [AllowAnonymous] // Allows anyone to view API events
+        public async Task<IActionResult> GetAllApi()
+        {
+            var events = await _db.Events.Include(e => e.Venue).ToListAsync();
+            return Ok(events);
+        }
+
+        [HttpGet("api/events/{id}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetByIdApi(int id)
+        {
+            var ev = await _db.Events.Include(e => e.Categories).FirstOrDefaultAsync(e => e.EventID == id);
+            if (ev == null) return NotFound();
+            return Ok(ev);
         }
     }
 }

@@ -1,0 +1,46 @@
+﻿@model RaceDayy.Models.Event
+
+@{
+    ViewData["Title"] = "Edit event";
+}
+
+<h1 class="h3">Edit event</h1>
+<hr />
+<div class="row">
+    <div class="col-lg-8">
+        <form asp-action="Edit" enctype="multipart/form-data">
+            <!-- Hidden ID is required -->
+            <input type="hidden" asp-for="EventID" />
+
+            <!-- Reuses the form fields -->
+            <partial name="_EventForm" model="Model" />
+
+            <div class="mb-3">
+                <label for="bannerFile" class="form-label">Banner image</label>
+                @if (!string.IsNullOrEmpty(Model.BannerImageUrl))
+                {
+                    <div class="mb-2">
+                        <img src="@Model.BannerImageUrl" alt="Current banner" class="img-thumbnail" style="max-height:140px" />
+                    </div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="removeBanner" name="removeBanner" value="true" />
+                        <label class="form-check-label" for="removeBanner">Remove current banner</label>
+                    </div>
+                }
+                <input type="file" id="bannerFile" name="bannerFile" class="form-control"
+                       accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" />
+                <div class="form-text">Choosing a new file replaces the current banner.</div>
+                @Html.ValidationMessage("bannerFile", new { @class = "text-danger" })
+            </div>
+
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+            <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

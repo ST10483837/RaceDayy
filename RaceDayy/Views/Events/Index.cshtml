@@ -1,0 +1,59 @@
+﻿@model IEnumerable<RaceDayy.Models.Event>
+
+@{
+    ViewData["Title"] = "Events";
+}
+
+<partial name="_Alerts" />
+
+<div class="d-flex justify-content-between align-items-center mt-3">
+    <h1>Events</h1>
+    @if (User.IsInRole("Admin") || User.IsInRole("Organizer"))
+    {
+        <a asp-controller="Events" asp-action="Create" class="btn btn-primary">Create Event</a>
+    }
+</div>
+
+<table class="table table-striped mt-3">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Date</th>
+            <th>Distance (km)</th>
+            <th>Event type</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.Any())
+        {
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.EventName</td>
+                    <td>@item.EventDate.ToString("yyyy-MM-dd HH:mm")</td>
+                    <td>@item.Distance</td>
+                    <td>@item.EventType</td>
+                    <td>
+                        <!-- Everyone can see Details -->
+                        <a asp-controller="Events" asp-action="Details" asp-route-id="@item.EventID" class="btn btn-sm btn-outline-primary">Details</a>
+
+                        <!-- Only Admin/Organizers can Edit, Delete, or Manage Categories -->
+                        @if (User.IsInRole("Admin") || User.IsInRole("Organizer"))
+                        {
+                            <a asp-controller="Events" asp-action="Edit" asp-route-id="@item.EventID" class="btn btn-sm btn-outline-warning">Edit</a>
+                            <a asp-controller="Events" asp-action="Delete" asp-route-id="@item.EventID" class="btn btn-sm btn-outline-danger">Delete</a>
+                            <a asp-controller="Categories" asp-action="Index" asp-route-eventId="@item.EventID" class="btn btn-sm btn-outline-info">Categories</a>
+                        }
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="5" class="text-center">No events found.</td>
+            </tr>
+        }
+    </tbody>
+</table>

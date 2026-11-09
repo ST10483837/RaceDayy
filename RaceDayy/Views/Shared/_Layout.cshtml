@@ -4,73 +4,160 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - RaceDayy</title>
+    <!-- Custom Font for that Energetic Sporting Look -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+    <style>
+        /* 🟣 PURPLE, 🔵 BLUE, ⚪ GREY THEME */
+        :root {
+            --primary-purple: #6a11cb;
+            --primary-blue: #2575fc;
+            --dark-grey: #2b2b2b;
+            --light-grey: #f4f5f7;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--light-grey);
+            color: #333;
+        }
+
+        /* Navbar Gradient */
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-blue) 100%) !important;
+            box-shadow: 0 4px 12px rgba(106, 17, 203, 0.3);
+        }
+
+        .navbar-brand {
+            font-weight: 900;
+            font-size: 1.6rem;
+            letter-spacing: 1px;
+            color: #ffffff !important;
+            text-shadow: 1px 1px 4px rgba(0,0,0,0.3);
+        }
+
+        .nav-link {
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+            transition: color 0.3s ease;
+        }
+
+            .nav-link:hover {
+                color: #d1d1d1 !important; /* Light grey on hover */
+            }
+
+        /* Buttons */
+        .btn-primary {
+            background: linear-gradient(to right, var(--primary-purple), var(--primary-blue));
+            border: none;
+            font-weight: 700;
+            border-radius: 8px;
+            padding: 10px 20px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+            .btn-primary:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 15px rgba(37, 117, 252, 0.4);
+                background: linear-gradient(to right, #5a0ead, #1f65d9);
+            }
+
+        /* Cards */
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease;
+            background-color: #ffffff;
+        }
+
+            .card:hover {
+                transform: translateY(-5px);
+            }
+
+        /* Table Headers */
+        thead.table-dark th {
+            background-color: var(--dark-grey) !important;
+            color: #fff;
+            border-bottom: 3px solid var(--primary-purple);
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--dark-grey);
+            color: #a0a0a0;
+            padding: 25px 0;
+            margin-top: auto;
+        }
+
+            footer a {
+                color: var(--primary-blue);
+                text-decoration: none;
+            }
+    </style>
 </head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+<body class="d-flex flex-column min-vh-100">
+    <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
-            <a class="navbar-brand" asp-controller="Home" asp-action="Index">RaceDayy</a>
+            <a class="navbar-brand" asp-controller="Home" asp-action="Index">RACE DAYY</a>
 
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navContent">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
             <div class="collapse navbar-collapse" id="navContent">
-                <!-- Left side: main navigation -->
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" asp-controller="Home" asp-action="Index">Home</a>
-                    </li>
-
-                    <!-- NEW EVENTS LINK -->
-                    <li class="nav-item">
-                        <a class="nav-link" asp-controller="EventsMvc" asp-action="Index">Events</a>
-                    </li>
-
-                    <li class="nav-item">
-                        <a class="nav-link" href="/swagger">Swagger API</a>
+                        <a class="nav-link text-white" asp-controller="Home" asp-action="Index">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" asp-controller="EnrollmentsMvc" asp-action="MyEnrollments">Enrollments</a>
+                        <a class="nav-link text-white" asp-controller="Events" asp-action="Index">Events</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" asp-controller="Enrollments" asp-action="MyEnrollments">My Enrollments</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="/swagger">API Docs</a>
                     </li>
 
                     @if (User.IsInRole("Admin"))
                     {
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="UserRoles" asp-action="Index">Manage Users</a>
+                            <a class="nav-link text-warning" asp-controller="UserRoles" asp-action="Index">Manage Users</a>
                         </li>
                     }
 
                     @if (User.IsInRole("Organizer"))
                     {
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="OrganizerDashboard" asp-action="Index">Organizer Dashboard</a>
+                            <a class="nav-link text-info" asp-controller="OrganizerDashboard" asp-action="Index">Dashboard</a>
                         </li>
                     }
                 </ul>
 
-                <!-- Right side: auth -->
                 <ul class="navbar-nav">
                     @if (User.Identity?.IsAuthenticated == true)
                     {
                         <li class="nav-item">
-                            <span class="navbar-text text-white me-3">
-                                Hello @User.Identity.Name!
+                            <span class="navbar-text text-light me-3 fw-bold">
+                                @User.Identity.Name
                             </span>
                         </li>
                         <li class="nav-item">
                             <form asp-area="Identity" asp-page="/Account/Logout" method="post" class="d-inline">
-                                <button type="submit" class="btn btn-outline-light btn-sm">Logout</button>
+                                <button type="submit" class="btn btn-outline-light btn-sm fw-bold" style="border-radius: 8px;">LOGOUT</button>
                             </form>
                         </li>
                     }
                     else
                     {
                         <li class="nav-item">
-                            <a class="nav-link" asp-area="Identity" asp-page="/Account/Login">Login</a>
+                            <a class="nav-link text-white" asp-area="Identity" asp-page="/Account/Login">Login</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="Identity" asp-page="/Account/Register">Register</a>
+                        <li class="nav-item ms-2">
+                            <a class="btn btn-light btn-sm fw-bold text-dark mt-1" style="border-radius: 8px;" asp-area="Identity" asp-page="/Account/Register">SIGN UP</a>
                         </li>
                     }
                 </ul>
@@ -78,12 +165,14 @@
         </div>
     </nav>
 
-    <div class="container mt-4">
+    <div class="container mt-4 flex-grow-1">
         @RenderBody()
     </div>
 
-    <footer class="text-center mt-5 mb-3 text-muted">
-        <p>&copy; 2026 - RaceDayy - <a href="/swagger">API Documentation</a></p>
+    <footer class="text-center mt-auto">
+        <div class="container">
+            <p class="mb-0">&copy; 2026 - RaceDayy Sporting Events - <a href="/swagger">API Documentation</a></p>
+        </div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

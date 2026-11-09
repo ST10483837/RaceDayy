@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using RaceDayy.Data;
+using RaceDayy.Models; // <-- Added for ApplicationUser
 using RaceDayy.Models.Interface;
+using RaceDayy.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,15 +22,17 @@ builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.R
 
 builder.Services.AddScoped<IProfileImageService, ProfileImageService>();
 
-// Support both MVC (Views) and API (Controllers)
-builder.Services.AddControllersWithViews();
+// Register the Azure Blob Storage Service
+builder.Services.AddScoped<IBlobStorageService, BlobStorageService>();
 
-// Add Swagger back
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+// Add MVC and Swagger
+builder.Services.AddControllersWithViews();
+builder.Services.AddEndpointsApiExplorer(); // <-- REQUIRED FOR SWAGGER
+builder.Services.AddSwaggerGen();           // <-- REQUIRED FOR SWAGGER
 
 var app = builder.Build();
 
+// Seed Roles and Admin
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
@@ -51,23 +55,23 @@ using (var scope = app.Services.CreateScope())
 
     if (await userManager.FindByEmailAsync(email) == null)
     {
-        var User = new ApplicationUser();
-        User.UserName = email;
-        User.Email = email;
-        User.EmailConfirmed = true;
+        var user = new ApplicationUser
+        {
+            UserName = email,
+            Email = email,
+            EmailConfirmed = true
+        };
 
-        await userManager.CreateAsync(User, password);
-        await userManager.AddToRoleAsync(User, "Admin");
+        await userManager.CreateAsync(user, password);
+        await userManager.AddToRoleAsync(user, "Admin");
     }
 }
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    // Enable Swagger
-    app.UseSwagger();
-    app.UseSwaggerUI();
-
+    app.UseSwagger();      // <-- ENABLES SWAGGER JSON
+    app.UseSwaggerUI();    // <-- ENABLES THE SWAGGER WEB PAGE
     app.UseMigrationsEndPoint();
 }
 else
@@ -77,21 +81,22 @@ else
 }
 
 app.UseHttpsRedirection();
-app.UseStaticFiles(); // Removed the duplicate here
+app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseAuthentication(); // Added this (good practice for Identity)
+app.UseAuthentication();
 app.UseAuthorization();
 
-// Map API Controllers (for Swagger /api/ routes)
-app.MapControllers();
-
-// Map MVC default route (for your Web Pages)
+// Map MVC default route
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
+// Map Razor Pages (Identity)
 app.MapRazorPages();
+
+// Map API Controllers (for Swagger testing)
+app.MapControllers();
 
 app.Run();

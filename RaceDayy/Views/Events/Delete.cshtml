@@ -1,0 +1,30 @@
+﻿@model RaceDayy.Models.Event
+
+@{
+    ViewData["Title"] = "Delete Event";
+}
+
+<h1>Delete Event</h1>
+
+<h3>Are you sure you want to delete this event?</h3>
+<div class="alert alert-danger mt-3">
+    <strong>Warning:</strong> Deleting this event will also delete all its categories, enrolments, and the banner image from Azure.
+</div>
+
+<div>
+    <h4>@Model.EventName</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-3">Date</dt>
+        <dd class="col-sm-9">@Model.EventDate.ToString("dddd, d MMMM yyyy HH:mm")</dd>
+
+        <dt class="col-sm-3">Distance</dt>
+        <dd class="col-sm-9">@Model.Distance km</dd>
+    </dl>
+
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="EventID" />
+        <button type="submit" class="btn btn-danger">Yes, Delete Event</button> |
+        <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>

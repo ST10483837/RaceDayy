@@ -1,0 +1,23 @@
+﻿# 1. Base image for running the app
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+WORKDIR /app
+EXPOSE 8080
+EXPOSE 8081
+
+# 2. Build image (SDK)
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+COPY ["RaceDayy.csproj", "./"]
+RUN dotnet restore "RaceDayy.csproj"
+COPY . .
+RUN dotnet build "RaceDayy.csproj" -c Release -o /app/build
+
+# 3. Publish image
+FROM build AS publish
+RUN dotnet publish "RaceDayy.csproj" -c Release -o /app/publish /p:UseAppHost=false
+
+# 4. Final image
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
+ENTRYPOINT ["dotnet", "RaceDayy.dll"]

@@ -63,7 +63,8 @@ docker run -d -p 8080:8080 --name racedayy-container racedayy-app
 CI/CD Status
 A GitHub Actions workflow is configured to automatically build the project and run unit tests on every push.
 
-https://ci-screenshot.png/
+<img width="1866" height="868" alt="image" src="https://github.com/user-attachments/assets/0107f504-541e-43ba-a3fa-7b70a5440c79" />
+
 
 Video Walkthrough
 Watch the Part 3 Walkthrough Here

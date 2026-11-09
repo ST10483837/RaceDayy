@@ -67,7 +67,8 @@ A GitHub Actions workflow is configured to automatically build the project and r
 
 
 Video Walkthrough
-Watch the Part 3 Walkthrough Here
+https://youtu.be/8q7IjuGNvR4?si=laGcxRyzRITYgM_1
+https://youtu.be/aFzftEC75Y0?si=3O2iXDIZ9jIJvw32
 
 Author
 Student Number: ST10483837
